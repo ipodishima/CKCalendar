@@ -77,5 +77,6 @@ typedef int startDay;
 @protocol CKCalendarDelegate <NSObject>
 
 - (void)calendar:(CKCalendarView *)calendar didSelectDate:(NSDate *)date;
+- (NSArray*)calendar:(CKCalendarView *)calendar flagsForDate:(NSDate *)date;
 
 @end

@@ -69,7 +69,7 @@
 
 @property (nonatomic, strong) NSDate *date;
 @property (nonatomic, strong) NSCalendar *calendar;
-
+@property (nonatomic, strong) NSArray *flags;
 @end
 
 @implementation DateButton
@@ -77,10 +77,41 @@
 @synthesize date = _date;
 @synthesize calendar = _calendar;
 
+- (void) drawRect:(CGRect)rect
+{
+    [super drawRect:rect];
+    CGFloat flagDiameter = 6.0;
+    CGFloat flagOffset = 2.0;
+    
+    // Get the number of flags
+    NSInteger numberOfFlags = _flags.count;
+    // Get the total size
+    CGFloat finalWidth = numberOfFlags * (flagOffset + flagDiameter);
+    // Todo: handle the case where too many flags
+    CGFloat startXPosition = (CGRectGetWidth(rect)-finalWidth)/2.0 + flagOffset/2.0;
+    
+    CGContextRef context = UIGraphicsGetCurrentContext();
+ 
+    for (int i = 0 ; i < _flags.count ; i++)
+    {
+        CGContextSetFillColorWithColor(context, [[_flags objectAtIndex:i] CGColor]);
+        CGContextFillEllipseInRect(context, CGRectMake(startXPosition + (flagOffset + flagDiameter) * i,
+                                                       CGRectGetHeight(rect) - flagDiameter - 3.0,
+                                                       flagDiameter,
+                                                       flagDiameter));
+    }
+}
+
 - (void)setDate:(NSDate *)date {
     _date = date;
     NSDateComponents *comps = [self.calendar components:NSDayCalendarUnit|NSMonthCalendarUnit fromDate:date];
     [self setTitle:[NSString stringWithFormat:@"%d", comps.day] forState:UIControlStateNormal];
+}
+
+- (void) setFlags:(NSArray *)flags
+{
+    _flags = flags;
+    [self setNeedsDisplay];
 }
 
 @end
@@ -307,6 +338,8 @@
         DateButton *dateButton = [self.dateButtons objectAtIndex:dateButtonPosition];
 
         dateButton.date = date;
+        dateButton.flags = [self.delegate calendar:self flagsForDate:date];
+        
         if ([self date:dateButton.date isSameDayAsDate:self.selectedDate]) {
             dateButton.backgroundColor = self.selectedDateBackgroundColor;
             [dateButton setTitleColor:self.selectedDateTextColor forState:UIControlStateNormal];

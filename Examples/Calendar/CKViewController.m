@@ -65,5 +65,25 @@
     self.dateLabel.text = [self.dateFormatter stringFromDate:date];
 }
 
+- (NSArray *)calendar:(CKCalendarView *)calendar flagsForDate:(NSDate *)date
+{
+    int random = arc4random()%5;
+    NSArray *array = nil;
+    switch (random) {
+        case 0:
+            array = [NSArray arrayWithObjects:[UIColor blueColor], [UIColor redColor], nil];
+            break;
+        case 1:
+            array = [NSArray arrayWithObjects:[UIColor greenColor], [UIColor blackColor], [UIColor yellowColor], nil];
+            break;
+        case 2:
+            array = [NSArray arrayWithObjects:[UIColor purpleColor], nil];
+            break;
+        default:
+            break;
+    }
+    return array;
+}
+
 
 @end
