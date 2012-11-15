@@ -191,6 +191,8 @@
     self.calendarStartDay = firstDay;
     self.shouldFillCalendar = NO;
 
+    self.adapthHeightToNumberOfWeeksInMonth = YES;
+    
     self.layer.cornerRadius = 6.0f;
 
     UIView *highlight = [[UIView alloc] initWithFrame:CGRectZero];
@@ -293,8 +295,11 @@
     CGFloat containerWidth = self.bounds.size.width - (CALENDAR_MARGIN * 2);
     self.cellWidth = (containerWidth / 7.0) - CELL_BORDER_WIDTH;
 
-    CGFloat containerHeight = ([self numberOfWeeksInMonthContainingDate:self.monthShowing] * (self.cellWidth + CELL_BORDER_WIDTH) + DAYS_HEADER_HEIGHT);
-
+    NSInteger numberOfWeeksToShow = 6;
+    if (self.adapthHeightToNumberOfWeeksInMonth) {
+        numberOfWeeksToShow = [self numberOfWeeksInMonthContainingDate:self.monthShowing];
+    }
+    CGFloat containerHeight = (numberOfWeeksToShow * (self.cellWidth + CELL_BORDER_WIDTH) + DAYS_HEADER_HEIGHT);
 
     CGRect newFrame = self.frame;
     newFrame.size.height = containerHeight + CALENDAR_MARGIN + TOP_HEIGHT;
@@ -325,12 +330,12 @@
             date = [self previousDay:date];
         }
     }
-
+    
     NSDate *endDate = [self firstDayOfNextMonthContainingDate:self.monthShowing];
     if (self.shouldFillCalendar) {
-        while ([self placeInWeekForDate:endDate] != 0) {
-            endDate = [self nextDay:endDate];
-        }
+        NSDateComponents *comps = [[NSDateComponents alloc] init];
+        [comps setWeek:numberOfWeeksToShow];
+        endDate = [self.calendar dateByAddingComponents:comps toDate:date options:0];
     }
 
     NSUInteger dateButtonPosition = 0;
@@ -464,6 +469,11 @@
         self.selectedDate = date;
         [self.delegate calendar:self didSelectDate:self.selectedDate];
     }
+}
+
+- (void)setAdapthHeightToNumberOfWeeksInMonth:(BOOL)adapthHeightToNumberOfWeeksInMonth {
+    _adapthHeightToNumberOfWeeksInMonth = adapthHeightToNumberOfWeeksInMonth;
+    [self setNeedsLayout];
 }
 
 #pragma mark - Theming getters/setters
